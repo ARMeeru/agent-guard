@@ -1,0 +1,34 @@
+{
+  "version": "0.1.0",
+  "description": "agent-guard rule set. Each rule matches a shell command (regex, case-insensitive) and aborts the tool call with the given reason. Defense-in-depth, not a guarantee.",
+  "categories": {
+    "credential-exfil": {
+      "summary": "Reading or using stored credentials to bypass an auth prompt.",
+      "rules": [
+        { "id": "keychain-find", "pattern": "security\\s+find-(internet|generic)-password", "label": "OS keychain credential read" },
+        { "id": "keychain-dump", "pattern": "security\\s+dump-keychain", "label": "OS keychain dump" },
+        { "id": "gh-token", "pattern": "\\bgh\\s+auth\\s+token\\b", "label": "gh stored-token extraction" },
+        { "id": "gh-with-token", "pattern": "gh\\s+auth\\s+login\\s+.*--with-token", "label": "gh login via piped token" },
+        { "id": "glab-token", "pattern": "\\bglab\\s+auth\\s+login\\s+.*--token", "label": "glab login via token" },
+        { "id": "gh-hosts", "pattern": "\\.config/gh/hosts\\.ya?ml", "label": "gh credentials file read" },
+        { "id": "netrc", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.netrc\\b", "label": ".netrc read" },
+        { "id": "git-credentials", "pattern": "\\.git-credentials\\b", "label": "git-credentials store read" },
+        { "id": "ssh-private", "pattern": "(cat|less|head|tail)\\s+[^\\n|]*(id_rsa|id_ed25519|id_ecdsa)(\\s|$)", "label": "SSH private key read" }
+      ]
+    },
+    "destructive-ops": {
+      "summary": "Irreversible destruction without the safe path.",
+      "rules": [
+        { "id": "rm-rf-root", "pattern": "\\brm\\s+-[a-z]*r[a-z]*f?\\s+(-[a-z]+\\s+)*(/|~|\\$HOME)", "label": "recursive delete of an absolute or home path" },
+        { "id": "git-force-push", "pattern": "git\\s+push\\s+.*(--force(?!-with-lease)|-f)\\b", "label": "force-push without --force-with-lease" },
+        { "id": "git-hard-reset-remote", "pattern": "git\\s+reset\\s+--hard\\s+origin/", "label": "hard reset to remote (discards local work)" }
+      ]
+    },
+    "network-egress": {
+      "summary": "Piping remote scripts straight into a shell (curl|bash).",
+      "rules": [
+        { "id": "curl-pipe-sh", "pattern": "(curl|wget)\\s+[^\\n|]*\\|\\s*(sudo\\s+)?(bash|sh|zsh)\\b", "label": "remote script piped into shell" }
+      ]
+    }
+  }
+}
