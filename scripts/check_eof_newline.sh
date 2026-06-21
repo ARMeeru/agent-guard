@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Verbatim mirror of the CI step's bash, used locally to verify the check
-# actually catches a violation before opening the PR.
+# Single source of truth for the final-newline check. CI (.github/workflows/ci.yml,
+# the eof-newline job) runs this exact script, and developers run it locally before
+# opening a PR. Fails (exit 1) listing any tracked text file missing a final newline.
 set -u
 offenders=()
 while IFS= read -r f; do
