@@ -11,10 +11,17 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded runs on the same ref so a force-push / new push to the
+# same PR or branch doesn't burn CI minutes on a stale run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: test (python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
