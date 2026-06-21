@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "agent-guard rule set. Each rule matches a shell command (regex, case-insensitive) and aborts the tool call with the given reason. Defense-in-depth, not a guarantee.",
   "categories": {
     "credential-exfil": {
@@ -13,7 +13,17 @@
         { "id": "gh-hosts", "pattern": "\\.config/gh/hosts\\.ya?ml", "label": "gh credentials file read" },
         { "id": "netrc", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.netrc\\b", "label": ".netrc read" },
         { "id": "git-credentials", "pattern": "\\.git-credentials\\b", "label": "git-credentials store read" },
-        { "id": "ssh-private", "pattern": "(cat|less|head|tail)\\s+[^\\n|]*(id_rsa|id_ed25519|id_ecdsa)(\\s|$)", "label": "SSH private key read" }
+        { "id": "ssh-private", "pattern": "(cat|less|head|tail)\\s+[^\\n|]*(id_rsa|id_ed25519|id_ecdsa)(\\s|$)", "label": "SSH private key read" },
+        { "id": "aws-credentials", "pattern": "\\.aws/credentials\\b", "label": "AWS credentials file read (~/.aws/credentials, not ~/.aws/config)" },
+        { "id": "gcp-adc", "pattern": "\\.config/gcloud/application_default_credentials\\.json\\b", "label": "GCP application default credentials file read" },
+        { "id": "azure-tokens", "pattern": "\\.azure/(accessTokens|azureSecret|msal_token_cache)\\.json\\b", "label": "Azure token-cache file read" },
+        { "id": "kube-config", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.kube/config\\b", "label": "kubeconfig file read (use kubectl, not cat)" },
+        { "id": "docker-config", "pattern": "\\.docker/config\\.json\\b", "label": "Docker registry-auth config file read" },
+        { "id": "npmrc", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.npmrc\\b", "label": ".npmrc credential file read" },
+        { "id": "pypirc", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.pypirc\\b", "label": ".pypirc credential file read" },
+        { "id": "metadata-endpoint", "pattern": "\\b169\\.254\\.169\\.254\\b", "label": "cloud instance metadata endpoint (classic SSRF for credential theft)" },
+        { "id": "shell-history", "pattern": "(^|\\s)(cat|less|head|tail|grep)\\s+[^\\n|]*\\.(bash|zsh)_history\\b", "label": "shell history file read (often contains typed credentials)" },
+        { "id": "clipboard-exfil", "pattern": "\\bpbpaste\\b[^\\n|]*\\|\\s*(curl|wget|nc|ncat|bash|sh)\\b", "label": "clipboard piped to network or shell (exfiltration / arbitrary exec)" }
       ]
     },
     "destructive-ops": {
@@ -28,6 +38,14 @@
       "summary": "Piping remote scripts straight into a shell (curl|bash).",
       "rules": [
         { "id": "curl-pipe-sh", "pattern": "(curl|wget)\\s+[^\\n|]*\\|\\s*(sudo\\s+)?(bash|sh|zsh)\\b", "label": "remote script piped into shell" }
+      ]
+    },
+    "data-exfiltration": {
+      "summary": "Outbound channels that hand a shell or environment to a remote attacker.",
+      "rules": [
+        { "id": "bash-reverse-shell", "pattern": "\\bbash\\s+-i\\b[^\\n|]*/dev/tcp/", "label": "bash interactive reverse shell via /dev/tcp" },
+        { "id": "nc-reverse-shell", "pattern": "\\b(nc|ncat|netcat)\\b[^\\n|]*\\s-e(\\s|/|$)", "label": "netcat reverse shell (-e /bin/sh)" },
+        { "id": "env-to-network", "pattern": "\\b(env|printenv)\\b[^\\n|]*\\|\\s*(curl|wget|nc|ncat)\\b", "label": "process environment piped to network (exfiltration)" }
       ]
     },
     "self-protection": {
