@@ -48,3 +48,17 @@ jobs:
         # tests/test_guard.py has a __main__ block so it runs directly,
         # and also works under pytest if anyone prefers.
         run: python tests/test_guard.py
+
+  eof-newline:
+    name: enforce final newline on tracked text files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check every tracked text file ends with a newline
+        # Single source of truth: run the same script developers run locally
+        # (scripts/check_eof_newline.sh). Keeping the logic in one place avoids
+        # the inline-copy-vs-script drift that previously broke this job.
+        run: bash scripts/check_eof_newline.sh
