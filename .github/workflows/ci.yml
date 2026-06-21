@@ -88,7 +88,7 @@ jobs:
             echo "::error::The following tracked text files are missing a final newline:"
             for f in "${offenders[@]}"; do
               echo "::error file=$f::missing final newline"
-            fi
+            done
             exit 1
           fi
           echo "all tracked text files end with a newline"
