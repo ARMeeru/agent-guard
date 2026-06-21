@@ -29,6 +29,13 @@
       "rules": [
         { "id": "curl-pipe-sh", "pattern": "(curl|wget)\\s+[^\\n|]*\\|\\s*(sudo\\s+)?(bash|sh|zsh)\\b", "label": "remote script piped into shell" }
       ]
+    },
+    "self-protection": {
+      "summary": "Attempts to disable or overwrite the guard itself. Guard administration is a deliberate human action, not an agent action.",
+      "rules": [
+        { "id": "unlock-guard", "pattern": "chflags\\s+no(uchg|schg)\\b[^\\n]*(agent-guard|\\.agent-guard)", "label": "clearing the immutable flag on guard files" },
+        { "id": "overwrite-guard", "pattern": "(>|>>|\\btee\\b|\\bcp\\b|\\bmv\\b|\\binstall\\b)[^\\n]*(agent-guard|\\.agent-guard)/(guard|rules)\\b", "label": "writing over the guard's own files" }
+      ]
     }
   }
 }
