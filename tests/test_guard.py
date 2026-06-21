@@ -1,5 +1,8 @@
 """Smoke tests for the agent-guard rule engine. Run: python3 tests/test_guard.py
 (or: python3 -m pytest tests/)."""
+# Python 3.9 is a supported target — `dict | None` style annotations require this.
+from __future__ import annotations
+
 import hashlib
 import json
 import os

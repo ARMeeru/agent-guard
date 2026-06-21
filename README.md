@@ -1,5 +1,7 @@
 # agent-guard
 
+[![CI](https://github.com/ARMeeru/agent-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/ARMeeru/agent-guard/actions/workflows/ci.yml)
+
 > A lightweight, rule-driven **safety layer for AI coding agents** — blocks credential
 > exfiltration, destructive operations, and risky network egress *before* the tool call runs.
 
